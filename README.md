@@ -80,6 +80,11 @@ When working with the [test data](/resources/video_game_reviews_example.json) a 
 ]
 ```
 
+### Additional requirements
+
+- The path to the file should be configurable
+- Keep in mind that the file might be too large to fit into memomry
+
 ## Running your service
 
 We will run your service and see if it does what it is expected to do.
