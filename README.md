@@ -46,7 +46,7 @@ It should then be running and listening on `localhost:8080`.
 
 ### Find the best rated products
 
-We want to search for best rated products within a certain period of time. The rating of a product is determined by the average number of stars (the `overall` field). Higher numbers means better rating. A date range (in which to search) will be given and the number of results should be limited by the given value.
+We want to search for best rated products within a certain period of time. The rating of a product is determined by the average number of stars (the `overall` field). Higher numbers means better rating. A date range **in UTC** (in which to search) will be given and the number of results should be limited by the given value `limit`. We only want to consider products that have a minimum number of reviews given by the parameter `min_number_reviews`.
 
 The request will be made like this:
 
