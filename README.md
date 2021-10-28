@@ -65,7 +65,7 @@ Content-Type: application/json
 
 Your API should respond to such a request by providing a list of results, where each result contains the product id (`asin`) and the average rating.
 
-When working with the [test data](/resources/video_game_reviews_example.json) a request like the one above should be answered like that (order is irrelevant):
+When working with the [test data](/resources/video_game_reviews_example.json) a request like the one above should be answered like that:
 
 ```json
 [
