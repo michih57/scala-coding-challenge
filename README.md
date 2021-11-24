@@ -83,7 +83,7 @@ When working with the [test data](/resources/video_game_reviews_example.json) a 
 ### Additional requirements
 
 - The path to the file should be configurable
-- Keep in mind that the file might be too large to fit into memomry
+- Keep in mind that the file might be too large to fit into memory
 
 ## Running your service
 
