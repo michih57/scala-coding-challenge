@@ -9,8 +9,11 @@ lazy val root = (project in file("."))
   .settings(
     name := "hivemind",
     libraryDependencies ++= Seq(
-      http4sServer,
       catsEffect,
+      decline,
+      bigSorter,
+      slf4j,
+      logbackClassic,
       scalaTest % Test
-    ) ++ circe
+    ) ++ http4s ++ circe
   )
