@@ -1,4 +1,5 @@
 package com.github.michih57.hivemind
+import cats.data.{EitherT, Kleisli}
 import cats.effect._
 import com.comcast.ip4s._
 import com.github.michih57.hivemind.ReviewSearchSorted.Filter
@@ -8,7 +9,15 @@ import org.http4s.circe.jsonEncoder
 import org.http4s.dsl.io._
 import org.http4s.ember.server._
 import org.http4s.implicits._
-import org.http4s.{EntityDecoder, HttpApp, HttpRoutes, circe}
+import org.http4s.{
+  DecodeFailure,
+  EntityDecoder,
+  HttpApp,
+  HttpRoutes,
+  Request,
+  Response,
+  circe
+}
 import org.slf4j.LoggerFactory
 
 import java.io.File
@@ -48,34 +57,40 @@ object ReviewService {
       .as(ExitCode.Success)
   }
 
-  private def mkService(reviewsFilepath: fs2.io.file.Path) = {
+  def mkService(
+      reviewsFilepath: fs2.io.file.Path
+  ): Kleisli[IO, Request[IO], Response[IO]] = {
     implicit val requestDecoder: EntityDecoder[IO, BestRatedRequest] =
       circe.jsonOf[IO, BestRatedRequest]
-    implicit val responseDecoder = circe.jsonOf[IO, TopProduct]
+    implicit val responseDecoder: EntityDecoder[IO, TopProduct] =
+      circe.jsonOf[IO, TopProduct]
 
     val reviewService = HttpRoutes
       .of[IO] { case req @ POST -> Root / "amazon" / "best-rated" =>
-        for {
-          params <- req.as[BestRatedRequest]
+        val service = for {
+          params <- req.attemptAs[BestRatedRequest]
           // TODO: maybe add logging how long the computation takes?
-          maybeProducts <- findTopProducts(reviewsFilepath, params)
-          response <- maybeProducts match {
-            case Success(products) => Ok(products.asJson)
-            case Failure(exc) =>
-              log.error("failed to find top products", exc)
-              InternalServerError(exc.getMessage)
-          }
+          topProducts <- findTopProducts(reviewsFilepath, params)
+          response <- EitherT.right[Throwable](Ok(topProducts.asJson))
         } yield response
+        service.value.flatMap {
+          case Right(resp) => IO(resp)
+          case Left(exc) =>
+            log.error("failed to find top products", exc)
+            exc match {
+              case df: DecodeFailure => BadRequest(df.getMessage())
+              case _                 => InternalServerError(exc.getMessage)
+            }
+        }
       }
-      .orNotFound
 
-    reviewService
+    reviewService.orNotFound
   }
 
   private def findTopProducts(
       reviewFilePath: fs2.io.file.Path,
       request: BestRatedRequest
-  ): IO[Try[Seq[TopProduct]]] = {
+  ): EitherT[IO, Throwable, Seq[TopProduct]] = {
     val filter = for {
       startDate <- Utils.parseDate(request.start)
       startTime = startDate.toEpochSecond(
@@ -94,16 +109,17 @@ object ReviewService {
       request.limit
     )
 
-    filter match {
-      case Success(f) =>
-        val reviewStream = fs2.io.file
-          .Files[IO]
-          .readUtf8Lines(
-            reviewFilePath
-          )
-        ReviewSearchSorted.search(f, reviewStream).map(Success.apply)
-      case Failure(exc) => IO.pure(Failure(exc))
-    }
+    for {
+      f <- EitherT.fromEither[IO](filter.toEither)
+      reviewStream = fs2.io.file
+        .Files[IO]
+        .readUtf8Lines(
+          reviewFilePath
+        )
+      result <- EitherT.right[Throwable](
+        ReviewSearchSorted.search(f, reviewStream)
+      )
+    } yield result
   }
 
 }

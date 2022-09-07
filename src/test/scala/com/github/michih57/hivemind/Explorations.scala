@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 class Explorations extends AnyFunSuite with Matchers {
 
-  ignore("blub") {
+  test("reviews file exploration") {
     val reviews = fs2.io.file
       .Files[IO]
       .readUtf8Lines(
@@ -20,12 +20,12 @@ class Explorations extends AnyFunSuite with Matchers {
         review
       }
       .groupAdjacentBy(_.asin)
-      .map(_._1)
+      .map(t => (t._1, t._2.size))
       .compile
       .toList
 
     val allProducts = result.unsafeRunSync()
-    println(allProducts.size)
+    println(allProducts.sortBy(_._2).mkString("\n"))
   }
 
 }

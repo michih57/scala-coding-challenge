@@ -7,6 +7,7 @@ import io.circe.syntax._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 
+// TODO: can consider to use of AsyncFunSuite to avoid blocking evaluation with `unsafeRunSync()`
 class ReviewSearchSortedTest extends AnyFunSuite with Matchers {
 
   private val reviewerID = "j.doe"

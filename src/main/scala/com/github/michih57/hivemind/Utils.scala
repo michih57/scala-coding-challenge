@@ -10,7 +10,6 @@ object Utils {
     DateTimeFormatter.ofPattern(dateFmt)
   }
 
-  // TODO: test me!
   def parseDate(dateStr: String): Try[LocalDate] = Try {
     LocalDate
       .parse(dateStr, formatter)

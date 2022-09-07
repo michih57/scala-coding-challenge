@@ -44,9 +44,14 @@ object ReviewSearchSorted {
   ): IO[List[TopProduct]] = {
     val topProductsAcc = reviews
       .groupAdjacentBy(_.asin)
+      // TODO: maybe refine this, if there are too many reviews for one product
+      //  i.e. split chunks into 'sub-chunks' of a maximal size, and collect
+      //  separate averages (which can be combined in the end)
       .collect {
         case (asin, productReviews) if productReviews.size >= minNrReviews =>
           val nrReviews = productReviews.size
+          // TODO: for really big data this can create an overflow
+          //  - solution: use BigDecimal
           val averageRating =
             productReviews.toList.map(_.overall).sum / nrReviews
           TopProduct(asin, averageRating)
