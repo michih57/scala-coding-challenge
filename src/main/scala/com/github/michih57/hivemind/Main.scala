@@ -1,4 +1,5 @@
 package com.github.michih57.hivemind
+
 import cats.effect._
 import com.github.davidmoten.bigsorter.Sorter
 import com.monovore.decline._
@@ -12,11 +13,14 @@ object Main extends IOApp {
 
   private val log = LoggerFactory.getLogger("Main")
 
+  // TODO: this is just for convenience during development
+  //   should be removed in a real production environment
   val defaultReviewFilePath =
     "src/test/resources/video_game_reviews_example.json"
 //  val defaultReviewFilePath = "../amazon-reviews.json"
 
   def run(args: List[String]): IO[ExitCode] = {
+    log.debug(s"program arguments: ${args.mkString(" ")}")
     val cmd = buildCmd()
     cmd.parse(args) match {
       case Left(help) =>
@@ -58,7 +62,7 @@ object Main extends IOApp {
         val sortedFile = sortedFilePath.toFile
 
         log.info(
-          s"sorting reviews file to: ${sortedFilePath.toAbsolutePath}..."
+          s"sorting reviews file ${reviewsFile.getAbsolutePath} to: ${sortedFilePath.toAbsolutePath}..."
         )
         Sorter
           .linesUtf8()

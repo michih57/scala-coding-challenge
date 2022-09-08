@@ -6,11 +6,11 @@ import org.scalatest.matchers.should.Matchers
 
 class Explorations extends AnyFunSuite with Matchers {
 
-  test("reviews file exploration") {
+  ignore("reviews file exploration") {
     val reviews = fs2.io.file
       .Files[IO]
       .readUtf8Lines(
-        fs2.io.file.Path("/tmp/amazon-reviews-sorted.json")
+        fs2.io.file.Path("/tmp/sorted_reviews_16804296920491059810.json")
       )
 
     val result = reviews

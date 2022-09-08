@@ -8,6 +8,7 @@ ThisBuild / organizationName := "michih57"
 lazy val root = (project in file("."))
   .settings(
     name := "hivemind",
+    Compile / mainClass := Some("com.github.michih57.hivemind.Main"),
     libraryDependencies ++= Seq(
       catsEffect,
       decline,
