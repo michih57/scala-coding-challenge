@@ -1,3 +1,5 @@
+# Note: implementation description/discussion is in `implementation.md`
+
 # Scala coding challenge - Amazon reviews
 
 Amazons online-shop is well known for its review system. Customers can write [reviews](https://www.amazon.com/Legend-Zelda-Links-Awakening-game-boy/dp/B00002ST3U?th=1#customerReviews) for products and rate them with stars from 1 to 5. Customer reviews themselves can be rated as helpful or not helpful by other customers.
