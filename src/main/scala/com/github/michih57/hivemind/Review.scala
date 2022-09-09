@@ -1,5 +1,6 @@
 package com.github.michih57.hivemind
 
+// TODO: a potential optimization would be to only parse the fields actually needed in the program
 case class Review(
     reviewerID: String,
     asin: String,

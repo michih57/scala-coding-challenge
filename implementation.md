@@ -7,11 +7,11 @@ server is started at port `8080`.
 
 # Library Choices
 
-- Server library: http4s for functional-style server. No prior experience, picked out of curiosity.
+- Server library: http4s for a functional-style server. No prior experience, picked out of curiosity.
 - File processing: fs2 for handling the review file as a stream. No prior experience, picked out of curiosity.
 - Sorting of reviews file: [big-sorter](https://github.com/davidmoten/big-sorter). Was the first library that I found
-  when searching for a solution to sort big files in Scala/Java (could also delegate to the `sort` via shell, but a Java
-  library seemed cleaner)
+  when searching for a solution to sort big files in Scala/Java (could also delegate to the `sort` utility via shell,
+  but a Java library seemed cleaner)
 - Testing: ScalaTest. It's just the one I'm most familiar with. (I know there are 'more functional' libraries out
   there.)
 - Command line arguments parsing: [decline](https://github.com/bkirwi/decline). Picked because it belongs to the
@@ -20,7 +20,7 @@ server is started at port `8080`.
 # Approach
 
 When the server is started, it preprocesses the reviews file to sort its lines by product. This way, when handling a
-request, the file can essentially be processed in chunks, because all reviews for one product are adjacent lines. For
+request, the file can essentially be processed in chunks, because all reviews for one product are in adjacent lines. For
 each product the average rating can thus be computed without having to have processed the complete file. This approach
 should be fairly easy on memory usage - at least in the large sample file no product had more than 18K reviews. If
 memory consumption needs to be brought down further, this could be done by splitting the chunk of reviews for one
@@ -38,15 +38,16 @@ database like PostgreSQL would fit nicely, as the requests translate quite direc
 ## Async testing
 
 Some tests use blocking evaluation calls on `IO` objects - it would make sense to leverage the capabilities of ScalaTest
-for asynchronous testing
+for asynchronous testing.
 
-## potential overflow in average rating computation
+## Potential overflow in average rating computation
 
 For very large review files, or rather products with a large amount of reviews, there is the possibility of overflows
 during the computation of their average rating. There are multiple ways to work around this issue, e.g. one could use
 number types like `BigDecimal` that take care of this problem. I suspect that this is the reason that the example
 response in the assignment has a very large precision (exceeding the precision of the standard JVM `double`) for the
-average rating of the second product: `3.666666666666666666666666666666667`
+average rating of the second product: `3.666666666666666666666666666666667`. If this was a hard requirement (to avoid
+potential overflows), my implementation would need to be changed (as it just uses the plain `double`).
 
 ## Error handling
 
